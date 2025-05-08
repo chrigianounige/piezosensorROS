@@ -166,7 +166,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/ReadPiezo.py
   scripts/PlotPiezoData.py
-  scripts/SaveData.py
+  scripts/SavePiezoData.py
 #  scripts/SaveDataOnEvent.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
