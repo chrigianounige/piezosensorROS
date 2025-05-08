@@ -10,7 +10,7 @@ from sensor_controller.srv import Tare, TareResponse
 
 class SensorController:
     def __init__(self):
-        rospy.init_node('sensor_controller', anonymous=False)
+        rospy.init_node('controller', anonymous=False)
 
         self.Pub = rospy.Publisher('/piezosensor', Piezosensor, queue_size=10)
         self.ThresholdPub = rospy.Publisher('/thresholds', Thresholds, queue_size=2)

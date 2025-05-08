@@ -164,10 +164,10 @@ include_directories(
 # )
 
 catkin_install_python(PROGRAMS
-  scripts/SimpleRead.py
-  scripts/PlotPiezoSensor.py
+  scripts/ReadPiezo.py
+  scripts/PlotPiezoData.py
   scripts/SaveData.py
-  scripts/SaveDataOnEvent.py
+#  scripts/SaveDataOnEvent.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
