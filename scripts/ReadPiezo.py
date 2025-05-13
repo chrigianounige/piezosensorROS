@@ -125,6 +125,8 @@ class SensorController:
     def publish_data(self):
         msg = Piezosensor()
         msg.data = self.data
+        msg.th_up = self.th_up
+        msg.th_down = self.th_down
         msg.timestamp = rospy.Time.now()
         self.Pub.publish(msg)
         self.rate.sleep()
