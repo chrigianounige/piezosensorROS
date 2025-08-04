@@ -7,13 +7,7 @@ FROM ros:noetic
 ENV DEBIAN_FRONTEND=noninteractive
 
 #### Aggiorna e installa pacchetti di base
-RUN apt-get update && apt-get install -y \
-    python3-pip \
-    python3-rosdep \
-    python3-colcon-common-extensions \
-    ros-noetic-ros-core \
-    ros-noetic-ros-base \
- && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y python3-pip python3-rosdep python3-colcon-common-extensions ros-noetic-ros-core ros-noetic-ros-base && rm -rf /var/lib/apt/lists/*
 
 #### Inizializza rosdep
 RUN rosdep init || true RUN rosdep update
@@ -25,9 +19,7 @@ RUN mkdir -p /root/**nome_progetto_ros**/src
 WORKDIR /root/**nome_progetto_ros**
 
 #### Inizializza la catkin_ws
-RUN cd /root/**nome_progetto_ros** && mkdir -p src && /bin/bash -c "source /opt/ros/noetic/setup.bash && \
-                  catkin_init_workspace src && \
-                  catkin_make" 
+RUN cd /root/**nome_progetto_ros** && mkdir -p src && /bin/bash -c "source /opt/ros/noetic/setup.bash &&  catkin_init_workspace src && catkin_make" 
 
 #### Sorgente automatico dell'ambiente ROS all'avvio
 RUN echo 'source /root/**nome_progetto_ros**/devel/setup.bash' >> /root/.bashrc
