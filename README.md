@@ -22,7 +22,7 @@ RUN rosdep update
 #### Crea una workspace ROS
 RUN mkdir -p /root/**nome_progetto_ros**/src
 
-WORKDIR /root/piezo_sensors_ros
+WORKDIR /root/**nome_progetto_ros**
 
 #### Inizializza la catkin_ws
 RUN cd /root/piezo_sensors_ros && \
