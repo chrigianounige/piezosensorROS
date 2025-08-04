@@ -1,12 +1,12 @@
 ###############################################
-# File Docker Di configurazione
+#### File Docker Di configurazione
 
 FROM ros:noetic
 
-# Imposta la variabile d'ambiente non interattiva
+#### Imposta la variabile d'ambiente non interattiva
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Aggiorna e installa pacchetti di base
+#### Aggiorna e installa pacchetti di base
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-rosdep \
@@ -15,24 +15,24 @@ RUN apt-get update && apt-get install -y \
     ros-noetic-ros-base \
  && rm -rf /var/lib/apt/lists/*
 
-# Inizializza rosdep
+#### Inizializza rosdep
 RUN rosdep init || true RUN rosdep update
 
-# Crea una workspace ROS
+#### Crea una workspace ROS
 RUN mkdir -p /root/**nome_progetto_ros**/src
 
-# Imposta la directory di lavoro
+#### Imposta la directory di lavoro
 WORKDIR /root/**nome_progetto_ros**
 
-# Inizializza la catkin_ws
+#### Inizializza la catkin_ws
 RUN cd /root/**nome_progetto_ros** && mkdir -p src && /bin/bash -c "source /opt/ros/noetic/setup.bash && \
                   catkin_init_workspace src && \
                   catkin_make" 
 
-# Sorgente automatico dell'ambiente ROS all'avvio
+#### Sorgente automatico dell'ambiente ROS all'avvio
 RUN echo 'source /root/**nome_progetto_ros**/devel/setup.bash' >> /root/.bashrc
 
-# Comando predefinito
+#### Comando predefinito
 CMD ["bash"]
 
 
@@ -57,6 +57,11 @@ CMD ["bash"]
    * *cd ~/piezo_ros*
    * *catkin_make*
    * *source devel/setup.bash*
+
+## Comandi per lanciare docker esistente ed elimniare docker
+* *sudo docker ps -a*  # per vedere docker esistenti
+* *sudo docker start -ai **nome_docker***  # per lanciare in esecuzione il docker
+* *sudo rm **nome_docker***  # per rimuovere un docker
 
 
 
