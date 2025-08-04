@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Inizializza rosdep
-RUN rosdep init || true && rosdep update
+RUN rosdep init || true RUN rosdep update
 
 # Crea una workspace ROS
 RUN mkdir -p /root/**nome_progetto_ros**/src
@@ -25,9 +25,9 @@ RUN mkdir -p /root/**nome_progetto_ros**/src
 WORKDIR /root/**nome_progetto_ros**
 
 # Inizializza la catkin_ws
-RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
+RUN cd /root/**nome_progetto_ros** && mkdir -p src && /bin/bash -c "source /opt/ros/noetic/setup.bash && \
                   catkin_init_workspace src && \
-                  catkin_make"
+                  catkin_make" 
 
 # Sorgente automatico dell'ambiente ROS all'avvio
 RUN echo 'source /root/**nome_progetto_ros**/devel/setup.bash' >> /root/.bashrc
