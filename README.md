@@ -25,7 +25,7 @@ RUN mkdir -p /root/**nome_progetto_ros**/src
 WORKDIR /root/**nome_progetto_ros**
 
 #### Inizializza la catkin_ws
-RUN cd /root/piezo_sensors_ros && \
+RUN cd /root/**nome_progetto_ros** && \
     mkdir -p src && \
     /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin_init_workspace src && catkin_make" && \
     echo "source /root/**nome_progetto_ros**/devel/setup.bash" >> /root/.bashrc
