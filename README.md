@@ -38,7 +38,7 @@ CMD ["bash"]
 ## Lista dei passaggi per creare docker
 1. Creare un cartella container, es. "ros_container"
 2. Creare un file Dockerfile di configurazione come quello sopra
-3. Fare il build del docker con *docker build -t **nome_progetto_ros***
+3. Fare il build del docker con *docker build -t **nome_progetto_ros** .*
 4. Lanciare il docker con le varie opzioni desiderate:
    * *docker run -it  /* # Avvia un nuovo container interattivo + terminale.
    * *-e DISPLAY=$DISPLAY /*  # per visualizzare i plot.
