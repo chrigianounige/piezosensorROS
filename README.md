@@ -1,37 +1,40 @@
 ###############################################
-### File Docker Di configurazione
+# File Docker Di configurazione
 
 FROM ros:noetic
 
-#### Imposta la variabile d'ambiente non interattiva
+# Imposta la variabile d'ambiente non interattiva
 ENV DEBIAN_FRONTEND=noninteractive
 
-#### Aggiorna e installa pacchetti di base
-RUN apt-get update && apt-get install -y /
-    python3-pip /
-    python3-rosdep /
-    python3-colcon-common-extensions /
-    ros-noetic-ros-core /
-    ros-noetic-ros-base /
-    && rm -rf /var/lib/apt/lists/*
+# Aggiorna e installa pacchetti di base
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-rosdep \
+    python3-colcon-common-extensions \
+    ros-noetic-ros-core \
+    ros-noetic-ros-base \
+ && rm -rf /var/lib/apt/lists/*
 
-#### Inizializza rosdep
-RUN rosdep init || true
-RUN rosdep update
+# Inizializza rosdep
+RUN rosdep init || true && rosdep update
 
-#### Crea una workspace ROS
+# Crea una workspace ROS
 RUN mkdir -p /root/**nome_progetto_ros**/src
 
+# Imposta la directory di lavoro
 WORKDIR /root/**nome_progetto_ros**
 
-#### Inizializza la catkin_ws
-RUN cd /root/**nome_progetto_ros** && /
-    mkdir -p src && /
-    /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin_init_workspace src && catkin_make" && /
-    echo "source /root/**nome_progetto_ros**/devel/setup.bash" >> /root/.bashrc
+# Inizializza la catkin_ws
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && \
+                  catkin_init_workspace src && \
+                  catkin_make"
 
+# Sorgente automatico dell'ambiente ROS all'avvio
+RUN echo 'source /root/**nome_progetto_ros**/devel/setup.bash' >> /root/.bashrc
 
+# Comando predefinito
 CMD ["bash"]
+
 
 ##############################################
 
