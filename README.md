@@ -58,6 +58,7 @@ CMD ["bash"]
 ## Lanciare in esecuzione nodi ROS
 * Eseguire *roscore* in un terminale del docker
 * Eseguire il launch in un altro terminale: *roslaunch **nome_cartella_package** **nome_file.launch***
+* Per lanciare un servizio *rosservice call /**nome_servizio.srv**
 
 ## Risolvere problemi legati alla GUI
 * *xhost +SI:localuser:root* # abilitare il root a usare serve X
