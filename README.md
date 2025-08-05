@@ -54,7 +54,11 @@ CMD ["bash"]
 * *sudo docker ps -a*  # per vedere docker esistenti
 * *sudo docker start -ai **nome_docker***  # per lanciare in esecuzione il docker
 * *sudo rm **nome_docker***  # per rimuovere un docker
-* *docker exec -it **nome_docker***  # per lanciare un altro terminale collegato al docker
+* *docker exec -it **nome_docker** bash*  # per lanciare un altro terminale collegato al docker
+
+## Lanciare in esecuzione nodi ROS
+* Eseguire *roscore* in un termianle del docker
+* Eseguire il launch in un altro terminale: *roslaunch **nome_cartella_package** **nome_file.launch***
 
 
 
