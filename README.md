@@ -65,7 +65,6 @@ CMD ["bash"]
 
 ## Creare un'immagine di un docker
 * *docker commit **nome_vecchio_docker** **nome_immagine_nuova***
-* 
-
+* Fare il run come sopra ma utilizzando la nuova immagine **nome_immagine_nuova** al posto di **nome_immagine_docker**
 
 
