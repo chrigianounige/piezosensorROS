@@ -7,7 +7,7 @@ FROM ros:noetic
 ENV DEBIAN_FRONTEND=noninteractive
 
 #### Aggiorna e installa pacchetti di base
-RUN apt-get update && apt-get install -y python3-pip python3-rosdep python3-colcon-common-extensions ros-noetic-ros-core ros-noetic-ros-base && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y python3-pip python3-rosdep python3-colcon-common-extensions python3-tk ros-noetic-ros-core ros-noetic-ros-base && rm -rf /var/lib/apt/lists/*
 
 #### Inizializza rosdep
 RUN rosdep init || true RUN rosdep update
@@ -41,7 +41,7 @@ CMD ["bash"]
    * *--network host \*  # Il container usa la rete dell’host direttamente.
    * *--device=/dev/ttyUSB0 \*  # Collega il dispositivo seriale /dev/ttyUSB0 dal tuo host al container.
    * *--name **nome_docker** \*  # Dai un nome al container.
-   * ***nome progetto ros** bash*  # Nome dell'immagine docker da cui creare il container
+   * ***nome_immagine_docker** bash*  # Nome dell'immagine docker da cui creare il container
 5. Dentro il docker:
    * *cd ~/**nome_progetto_ros**/src*
    * *catkin_create_pkg **nome_cartella_package** std_msgs rospy roscpp*
@@ -63,6 +63,9 @@ CMD ["bash"]
 * *xhost +SI:localuser:root* # abilitare il root a usare serve X
 * *mkdir -p /tmp/ros_home/.ros* # dentro al docker creare questa cartella
 
+## Creare un'immagine di un docker
+* *docker commit **nome_vecchio_docker** **nome_immagine_nuova***
+* 
 
 
 
