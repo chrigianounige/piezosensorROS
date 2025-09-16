@@ -7,7 +7,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 from collections import deque
 from matplotlib.lines import Line2D
-from main_folder.msg import sensors, thresholds
+from piezosensorROS.msg import sensors, thresholds # Metti il nome del progetto ROS
 
 class PlotterNode:
     def __init__(self):
