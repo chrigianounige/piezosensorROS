@@ -39,10 +39,14 @@ CMD ["bash"]
 
 ## Steps to build and run Docker
 1. Create a folder for the container, e.g. ros_container
-2. Create a configuration file **Dockerfile** as shown above inside the folder:
+2. Enter in the folder:
+```bash
+$ cd ros_container
+r
+4. Create a configuration file **Dockerfile** as shown above inside the folder:
 ```bash
 touch Dockerfile
-
+r
 4. Fare il build del docker con *sudo docker build -t **nome_progetto_ros** .*
 5. Lanciare il docker con le varie opzioni desiderate:
    * *sudo docker run -it  \* # Avvia un nuovo container interattivo + terminale.
