@@ -1,19 +1,19 @@
 <launch>
- <!-- Avvia il nodo del plot -->
-    <node pkg="controller" type="PlotPiezoData.py" name="plot_node" output="screen">
-        <param name="n_sensors" value="8"/>
-        <param name="buffer_size" value="1000"/>
-    </node>
+  <!-- Nodo per il plotting -->
+  <node pkg="piezosensorROS" type="PlotPiezoData.py" name="plot_node" output="screen">
+    <param name="n_sensors" value="8"/>
+    <param name="buffer_size" value="1000"/>
+  </node>
 
-    <!-- Avvia il nodo per acquisire -->
-    <node pkg="controller" type="ReadPiezo.py" name="acquire_node" output="screen">
-        <param name="n_sensors" value="8"/>
-        <param name="rate" value="3000"/>
-        <param name="start_tare" value="False"/>
-        <param name="tare_window" value="1000"/>
-        <param name="str1" value="num1,17,18,19,20\r\n"/>
-        <param name="str2" value="num2,21,22,23,24\r\n"/>
-        <!-- param name="str3" value="num3,25,26,27,28\r\n"/-->
-        <!-- param name="str4" value="num4,29,30,31,32\r\n"/-->
-   </node>
+  <!-- Nodo per l’acquisizione -->
+  <node pkg="piezosensorROS" type="ReadPiezo.py" name="acquire_node" output="screen">
+    <param name="n_sensors" value="8"/>
+    <param name="rate" value="3000"/>
+    <param name="start_tare" value="False"/>
+    <param name="tare_window" value="1000"/>
+    <param name="str1" value="num1,17,18,19,20\r\n"/>
+    <param name="str2" value="num2,21,22,23,24\r\n"/>
+    <!-- <param name="str3" value="num3,25,26,27,28\r\n"/> -->
+    <!-- <param name="str4" value="num4,29,30,31,32\r\n"/> -->
+  </node>
 </launch>
