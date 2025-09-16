@@ -1,12 +1,12 @@
-###############################################
-#### #Docker Configuration File
+# Docker Configuration File
 
+```dockerfile
 FROM ros:noetic
 
-#### #Set non-interactive environment variable
+# Set non-interactive environment variable
 ENV DEBIAN_FRONTEND=noninteractive
 
-#### #Update and install basic packages
+# Update and install basic packages
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-rosdep \
@@ -14,82 +14,126 @@ RUN apt-get update && apt-get install -y \
     python3-tk \
     ros-noetic-ros-core \
     ros-noetic-ros-base \
+    git \
+    nano \
  && rm -rf /var/lib/apt/lists/*
 
-#### Install Python dependencies with pip
+# Install Python dependencies with pip
 RUN pip install --no-cache-dir matplotlib pyserial numpy
 
-#### #Initialize rosdep
+# Initialize rosdep
 RUN rm -f /etc/ros/rosdep/sources.list.d/20-default.list && rosdep init && rosdep update
- 
-#### #Create a ROS workspace
-RUN mkdir -p /root/**project_name_ros**/src
 
-#### #Set working directory
-WORKDIR /root/**project_name_ros**
+# Create a ROS workspace
+RUN mkdir -p /root/project_name_ros/src
 
-#### #Initialize catkin workspace
-RUN cd /root/**project_name_ros** && mkdir -p src && /bin/bash -c "source /opt/ros/noetic/setup.bash &&  catkin_init_workspace src && catkin_make" 
+# Set working directory
+WORKDIR /root/project_name_ros
 
-#### #Auto-source ROS environment at startup
-RUN echo 'source /root/**project_name_ros**/devel/setup.bash' >> /root/.bashrc
+# Initialize catkin workspace
+RUN cd /root/project_name_ros && mkdir -p src && /bin/bash -c "source /opt/ros/noetic/setup.bash &&  catkin_init_workspace src && catkin_make"
 
-####  #Default command
+# Auto-source ROS environment at startup
+RUN echo 'source /root/project_name_ros/devel/setup.bash' >> /root/.bashrc
+
+# Default command
 CMD ["bash"]
+```
 
-
-##############################################
-
-## Steps to build and run Docker
+# Steps to build and run Docker
 1. Create a folder for the container, e.g. ros_container
 2. Enter in the folder:
 ```bash
 cd ros_container
 ```
-4. Create a configuration file **Dockerfile** as shown above inside the folder:
+4. Create a configuration file **Dockerfile**  inside the folder:
 ```bash
 touch Dockerfile
 ```
-5. Fare il build del docker con:
+5. Copy the example above inside the file
+6. Fare il build del docker con:
 ```bash
  sudo docker build -t **project_name_ros** .
 ```
-6. Run the docker with the desidered options:
-   ```bash
-   # Run a new Docker container interactively with a terminal
+7. Run the docker with the desidered options:
+```bash
+# Run a new Docker container interactively with a terminal
 sudo docker run -it \
-    -e DISPLAY=$DISPLAY \       # Allow GUI applications to display plots
-    -v /tmp/.X11-unix:/tmp/.X11-unix \  # Mount X11 socket to display plots
-    --network host \            # Use the host's network directly
-    --device=/dev/ttyUSB0 \     # Connect the host's serial device /dev/ttyUSB0
-    --name nome_docker \        # Name the container
-    nome_progetto_ros bash      # Image to create the container from
+-e DISPLAY=$DISPLAY \       # Allow GUI applications to display plots
+-v /tmp/.X11-unix:/tmp/.X11-unix \  # Mount X11 socket to display plots
+--network host \            # Use the host's network directly
+--device=/dev/ttyUSB0 \     # Connect the host's serial device /dev/ttyUSB0
+--name **container_name** \       # Name the container
+**project_name_ros** bash      # Image to create the container from
 ```
-6. Dentro il docker:
-   * *cd ~/**nome_progetto_ros**/src*
-   * 
-   * *catkin_create_pkg **nome_cartella_package** std_msgs rospy roscpp*
-   * *cd ~/**nome_progetto_ros***
-   * *catkin_make*
-   * *source devel/setup.bash*
+7. You are now inside the docker, then:
+```bash
+   cd ~/**project_name_ros**/src
+```
+8. You can create a new ROS package or clone from github:
+```bash
+# Create a new package
+catkin_create_pkg **package_name** std_msgs rospy roscpp
+cd ~/**nome_progetto_ros**
+catkin_make
+source devel/setup.bash
+```
+```bash
+# Clone the package from github
+git clone **URL**
+```
 
-## Comandi per lanciare docker esistente ed eliminare docker
-* *sudo docker ps -a*  # per vedere docker esistenti
-* *sudo docker start -ai **nome_docker***  # per lanciare in esecuzione il docker
-* *sudo rm **nome_docker***  # per rimuovere un docker
-* *docker exec -it **nome_docker** bash*  # per lanciare un altro terminale collegato al docker
+# Commands to run an existing Docker container and remove Docker containers
+```bash
+# List all existing Docker containers
+sudo docker ps -a
+```
+```bash
+# Start the Docker container interactively
+sudo docker start -ai **container_name**
+```
+```bash
+# Remove a Docker container
+sudo rm **container_name**
+```
+```bash
+# Open another terminal attached to the Docker container
+docker exec -it **container_name** bash
+```
 
-## Lanciare in esecuzione nodi ROS
-* Eseguire *roscore* in un terminale del docker
-* Eseguire il launch in un altro terminale: *roslaunch **nome_cartella_package** **nome_file.launch***
-* Per lanciare un servizio *rosservice call /**nome_servizio.srv**
+# Running ROS nodes
+* In one terminal inside the Docker container run:
+```bash
+roscore
+```
+* Run the launch file in another terminal:
+```bash
+cd src/**package_name**
+roslaunch **launch_file_name.launch**
+```
+* To call a service:
+```bash
+rosservice call /**service_name**
+```
 
-## Risolvere problemi legati alla GUI
-* *xhost +SI:localuser:root* # abilitare il root a usare serve X
-* *mkdir -p /tmp/ros_home/.ros* # dentro al docker creare questa cartella
+# Fixing GUI-related issues
+* Outside the docker:
+```bash
+# Allow root to access the X server
+xhost +SI:localuser:root
+```
+* Inside the container:
+```bash
+mkdir -p /tmp/ros_home/.ros* 
+```
 
-## Creare un'immagine di un docker
-* *docker commit **nome_vecchio_docker** **nome_immagine_nuova***
-* Fare il run come sopra ma utilizzando la nuova immagine **nome_immagine_nuova** al posto di **nome_immagine_docker**
+# Creating a Docker image
+* Create a new Docker image from an existing container. This saves the current state of the container so you can reuse it later:
+```bash
+docker commit **old_container_name** **new_image_name**
+```
+* Run the docker using *docker run ...* as before, but use the new image **new_image_name** instead of **docker_image_name**
+This allows you to start a new container with all the changes and setups you made in the original container.
+
 
 
