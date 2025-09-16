@@ -5,8 +5,8 @@ import struct
 import numpy as np
 import time
 import rospy
-from sensor_controller.msg import Piezosensor, Thresholds
-from sensor_controller.srv import Tare, TareResponse
+from piezosensorROS.msg import Piezosensor, Thresholds
+from piezosensorROS.srv import Tare, TareResponse
 
 class SensorController:
     def __init__(self):
