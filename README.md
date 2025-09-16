@@ -39,9 +39,12 @@ CMD ["bash"]
 
 ## Steps to build and run Docker
 1. Create a folder for the container, e.g. ros_container
-2. Create a configuration file **Dockerfile** as shown above inside the folder using  ```bash $touch Dockerfile
-3. Fare il build del docker con *sudo docker build -t **nome_progetto_ros** .*
-4. Lanciare il docker con le varie opzioni desiderate:
+2. Create a configuration file **Dockerfile** as shown above inside the folder:
+```bash
+touch Dockerfile
+
+4. Fare il build del docker con *sudo docker build -t **nome_progetto_ros** .*
+5. Lanciare il docker con le varie opzioni desiderate:
    * *sudo docker run -it  \* # Avvia un nuovo container interattivo + terminale.
    * *-e DISPLAY=$DISPLAY \*  # per visualizzare i plot.
    * *-v /tmp/.X11-unix:/tmp/.X11-unix \* # per visualizzare i plot.
@@ -49,7 +52,7 @@ CMD ["bash"]
    * *--device=/dev/ttyUSB0 \*  # Collega il dispositivo seriale /dev/ttyUSB0 dal tuo host al container.
    * *--name **nome_docker** \*  # Dai un nome al container.
    * **nome_progetto_ros** bash*  # Nome dell'immagine docker da cui creare il container
-5. Dentro il docker:
+6. Dentro il docker:
    * *cd ~/**nome_progetto_ros**/src*
    * 
    * *catkin_create_pkg **nome_cartella_package** std_msgs rospy roscpp*
