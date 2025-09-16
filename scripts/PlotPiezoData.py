@@ -3,6 +3,8 @@
 import rospy
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
 from matplotlib.lines import Line2D
 from collections import deque
 from matplotlib.animation import FuncAnimation
