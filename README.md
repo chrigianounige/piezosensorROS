@@ -16,6 +16,9 @@ RUN apt-get update && apt-get install -y \
     ros-noetic-ros-base \
  && rm -rf /var/lib/apt/lists/*
 
+#### Install Python dependencies with pip
+RUN pip install --no-cache-dir matplotlib pyserial numpy
+
 #### #Initialize rosdep
 RUN rm -f /etc/ros/rosdep/sources.list.d/20-default.list && rosdep init && rosdep update
  
@@ -51,14 +54,17 @@ touch Dockerfile
 ```bash
  sudo docker build -t **project_name_ros** .
 ```
-5. Lanciare il docker con le varie opzioni desiderate:
-   * *sudo docker run -it  \* # Avvia un nuovo container interattivo + terminale.
-   * *-e DISPLAY=$DISPLAY \*  # per visualizzare i plot.
-   * *-v /tmp/.X11-unix:/tmp/.X11-unix \* # per visualizzare i plot.
-   * *--network host \*  # Il container usa la rete dell’host direttamente.
-   * *--device=/dev/ttyUSB0 \*  # Collega il dispositivo seriale /dev/ttyUSB0 dal tuo host al container.
-   * *--name **nome_docker** \*  # Dai un nome al container.
-   * **nome_progetto_ros** bash*  # Nome dell'immagine docker da cui creare il container
+6. Run the docker with the desidered options:
+   ```bash
+   # Run a new Docker container interactively with a terminal
+sudo docker run -it \
+    -e DISPLAY=$DISPLAY \       # Allow GUI applications to display plots
+    -v /tmp/.X11-unix:/tmp/.X11-unix \  # Mount X11 socket to display plots
+    --network host \            # Use the host's network directly
+    --device=/dev/ttyUSB0 \     # Connect the host's serial device /dev/ttyUSB0
+    --name nome_docker \        # Name the container
+    nome_progetto_ros bash      # Image to create the container from
+```
 6. Dentro il docker:
    * *cd ~/**nome_progetto_ros**/src*
    * 
