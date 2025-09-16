@@ -50,8 +50,8 @@ class PlotterNode:
         self.ax.legend()
 
         # Sottoscrizione al topic dei sensori
-        rospy.Subscriber('/piezosensors', sensors, self.callback)
-        rospy.Subscriber('/thresholds', thresholds, self.threshold_callback)
+        rospy.Subscriber('/piezosensors', Piezosensor, self.callback)
+        rospy.Subscriber('/thresholds', Thresholds, self.threshold_callback)
 
     def callback(self, msg):
         data = msg.data  # Lista di valori ricevuti
