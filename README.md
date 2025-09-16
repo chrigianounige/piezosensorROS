@@ -1,12 +1,12 @@
 ###############################################
-# #### Docker Configuration File
+#### #Docker Configuration File
 
 FROM ros:noetic
 
-# #### Set non-interactive environment variable
+#### #Set non-interactive environment variable
 ENV DEBIAN_FRONTEND=noninteractive
 
-# #### Update and install basic packages
+#### #Update and install basic packages
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-rosdep \
@@ -16,22 +16,22 @@ RUN apt-get update && apt-get install -y \
     ros-noetic-ros-base \
  && rm -rf /var/lib/apt/lists/*
 
-# #### Initialize rosdep
+#### #Initialize rosdep
 RUN rm -f /etc/ros/rosdep/sources.list.d/20-default.list && rosdep init && rosdep update
  
-# #### Create a ROS workspace
+#### #Create a ROS workspace
 RUN mkdir -p /root/**project_name_ros**/src
 
-# #### Set working directory
+#### #Set working directory
 WORKDIR /root/**project_name_ros**
 
-# #### Initialize catkin workspace
+#### #Initialize catkin workspace
 RUN cd /root/**project_name_ros** && mkdir -p src && /bin/bash -c "source /opt/ros/noetic/setup.bash &&  catkin_init_workspace src && catkin_make" 
 
-# #### Auto-source ROS environment at startup
+#### #Auto-source ROS environment at startup
 RUN echo 'source /root/**project_name_ros**/devel/setup.bash' >> /root/.bashrc
 
-# #### Default command
+####  #Default command
 CMD ["bash"]
 
 
