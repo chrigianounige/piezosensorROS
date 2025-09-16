@@ -7,7 +7,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 from collections import deque
 from matplotlib.lines import Line2D
-from piezosensorROS.msg import sensors, thresholds # Metti il nome del progetto ROS
+from piezosensorROS.msg import Piezosensors, Thresholds # Metti il nome del progetto ROS
 
 class PlotterNode:
     def __init__(self):
@@ -50,7 +50,7 @@ class PlotterNode:
         self.ax.legend()
 
         # Sottoscrizione al topic dei sensori
-        rospy.Subscriber('/sensors', sensors, self.callback)
+        rospy.Subscriber('/piezosensors', sensors, self.callback)
         rospy.Subscriber('/thresholds', thresholds, self.threshold_callback)
 
     def callback(self, msg):
