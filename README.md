@@ -25,16 +25,16 @@ RUN pip install --no-cache-dir matplotlib pyserial numpy
 RUN rm -f /etc/ros/rosdep/sources.list.d/20-default.list && rosdep init && rosdep update
 
 # Create a ROS workspace
-RUN mkdir -p /root/project_name_ros/src
+RUN mkdir -p /root/**project_name_ros**/src
 
 # Set working directory
-WORKDIR /root/project_name_ros
+WORKDIR /root/**project_name_ros**
 
 # Initialize catkin workspace
-RUN cd /root/project_name_ros && mkdir -p src && /bin/bash -c "source /opt/ros/noetic/setup.bash &&  catkin_init_workspace src && catkin_make"
+RUN cd /root/**project_name_ros** && mkdir -p src && /bin/bash -c "source /opt/ros/noetic/setup.bash &&  catkin_init_workspace src && catkin_make"
 
 # Auto-source ROS environment at startup
-RUN echo 'source /root/project_name_ros/devel/setup.bash' >> /root/.bashrc
+RUN echo 'source /root/**project_name_ros**/devel/setup.bash' >> /root/.bashrc
 
 # Default command
 CMD ["bash"]
@@ -46,25 +46,30 @@ CMD ["bash"]
 ```bash
 cd ros_container
 ```
-4. Create a configuration file **Dockerfile**  inside the folder:
+3. Create a configuration file **Dockerfile**  inside the folder:
 ```bash
 touch Dockerfile
 ```
-5. Copy the example above inside the file
-6. Fare il build del docker con:
+4. Copy the example above inside the file
+5. Build the docker:
 ```bash
  sudo docker build -t **project_name_ros** .
 ```
-7. Run the docker with the desidered options:
+6. Run the docker with the desidered options:
 ```bash
 # Run a new Docker container interactively with a terminal
+# Allow GUI applications to display plots
+# Mount X11 socket to display plots
+# Use the host's network directly
+# Connect the host's serial device /dev/ttyUSB0
+# Image to create the container from
 sudo docker run -it \
--e DISPLAY=$DISPLAY \       # Allow GUI applications to display plots
--v /tmp/.X11-unix:/tmp/.X11-unix \  # Mount X11 socket to display plots
---network host \            # Use the host's network directly
---device=/dev/ttyUSB0 \     # Connect the host's serial device /dev/ttyUSB0
---name **container_name** \       # Name the container
-**project_name_ros** bash      # Image to create the container from
+-e DISPLAY=$DISPLAY \       
+-v /tmp/.X11-unix:/tmp/.X11-unix \  
+--network host \            
+--device=/dev/ttyUSB0 \     
+--name **container_name** \       
+**project_name_ros** bash      
 ```
 7. You are now inside the docker, then:
 ```bash
@@ -74,13 +79,16 @@ sudo docker run -it \
 ```bash
 # Create a new package
 catkin_create_pkg **package_name** std_msgs rospy roscpp
-cd ~/**nome_progetto_ros**
-catkin_make
-source devel/setup.bash
 ```
 ```bash
 # Clone the package from github
 git clone **URL**
+```
+Then:
+```bash
+cd ~/**nome_progetto_ros**
+catkin_make
+source devel/setup.bash
 ```
 
 # Commands to run an existing Docker container and remove Docker containers
