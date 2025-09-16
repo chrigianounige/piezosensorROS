@@ -46,7 +46,7 @@ class PlotterNode:
         rospy.Subscriber('/thresholds', Thresholds, self.threshold_callback)
 
         # Animazione
-        self.ani = FuncAnimation(self.fig, self.update_plot, interval=50, blit=False)
+        self.ani = FuncAnimation(self.fig, self.update_plot, interval=50, blit=False, cache_frame_data=False)
 
     def callback(self, msg):
         data = msg.data
