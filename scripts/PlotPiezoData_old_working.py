@@ -5,63 +5,62 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('TkAgg')
-from matplotlib.lines import Line2D
 from collections import deque
+from matplotlib.lines import Line2D
 from piezosensorROS.msg import Piezosensor, Thresholds
 
 class PlotterNode:
     def __init__(self):
         rospy.init_node('plotter_node', anonymous=True)
 
-        # Parametri
+        # Buffer per memorizzare gli ultimi buffer_size valori per ogni sensore
         self.buffer_size = rospy.get_param("~buffer_size", 1000)
-        self.n_sensors = rospy.get_param("~n_sensors", 8)
+        self.n_sensors = rospy.get_param("~n_sensors", 8)  # Cambia questo numero
         self.data_buffer = [deque([0]*self.buffer_size, maxlen=self.buffer_size) for _ in range(self.n_sensors)]
 
-        # Soglie
+        # Inizializza le soglie
         self.th_up = np.array([0] * self.n_sensors)
-        self.th_down = np.array([2**16-1] * self.n_sensors)
+        self.th_down = np.array([2**16] * self.n_sensors)
 
-        # Setup figura
+
+        # Setup della finestra di plot
         self.fig, self.ax = plt.subplots()
         self.lines = [self.ax.plot([], [], label=f"Sensor {i+1}")[0] for i in range(self.n_sensors)]
-        self.th_up_lines = []
-        self.th_down_lines = []
+        # Linee delle soglie
+        # Linee delle soglie (adesso sono Line2D)
+        self.th_up_lines = [Line2D([], [], color='r', linestyle='--', alpha=0.5) for _ in range(self.n_sensors)]
+        self.th_down_lines = [Line2D([], [], color='b', linestyle='--', alpha=0.5) for _ in range(self.n_sensors)]
 
-        x_data = range(self.buffer_size)
-        for i, line in enumerate(self.lines):
-            color = line.get_color()
-            th_up_line = Line2D(x_data, [self.th_up[i]] * self.buffer_size, color=color, linestyle='--', alpha=0.7)
-            th_down_line = Line2D(x_data, [self.th_down[i]] * self.buffer_size, color=color, linestyle=':', alpha=0.7)
-            self.th_up_lines.append(th_up_line)
-            self.th_down_lines.append(th_down_line)
-            self.ax.add_line(th_up_line)
-            self.ax.add_line(th_down_line)
 
         self.ax.set_xlim(0, self.buffer_size)
-        self.ax.set_ylim(0, 65535)
+        self.ax.set_ylim(0, 65535)  # Regola i limiti in base ai tuoi dati
         self.ax.set_xlabel("Campioni")
         self.ax.set_ylabel("Valore Sensore")
         self.ax.set_title(f"Dati Sensori Piezoelettrici (Ultimi {self.buffer_size} Campioni)")
         self.ax.legend()
 
-        # Subscriber ROS
+        # Sottoscrizione al topic dei sensori
         rospy.Subscriber('/piezosensor', Piezosensor, self.callback)
         rospy.Subscriber('/thresholds', Thresholds, self.threshold_callback)
 
-
     def callback(self, msg):
-        data = msg.data
+        data = msg.data  # Lista di valori ricevuti
+
         if len(data) != self.n_sensors:
             rospy.logwarn("Numero di sensori ricevuti non corrisponde!")
             return
+
+        # Aggiunge i nuovi dati al buffer
         for i in range(self.n_sensors):
             self.data_buffer[i].append(data[i])
 
+
     def threshold_callback(self, msg):
+        """ Callback per aggiornare le soglie """
         self.th_up = msg.th_up
         self.th_down = msg.th_down
         rospy.loginfo("Soglie aggiornate!")
+
 
     def run(self):
         rate = rospy.Rate(100)  # Frequenza di aggiornamento
@@ -69,8 +68,7 @@ class PlotterNode:
             for i in range(self.n_sensors):
                 self.lines[i].set_xdata(range(self.buffer_size))
                 self.lines[i].set_ydata(list(self.data_buffer[i]))
-                self.th_up_lines[i].set_xdata(range(self.buffer_size))
-                self.th_down_lines[i].set_xdata(range(self.buffer_size))
+
                 self.th_up_lines[i].set_ydata([self.th_up[i]] * self.buffer_size)
                 self.th_down_lines[i].set_ydata([self.th_down[i]] * self.buffer_size)
 
@@ -80,5 +78,3 @@ class PlotterNode:
 if __name__ == '__main__':
     plotter = PlotterNode()
     plotter.run()
-
-        
