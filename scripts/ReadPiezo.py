@@ -26,7 +26,7 @@ class SensorController:
         self.tare_base = np.array([0 for i in range(self.n_sensors)])
         self.tare_std = np.array([0 for i in range(self.n_sensors)])
         self.th_up = np.array([0 for i in range(self.n_sensors)])
-        self.th_down = np.array([2**16 for i in range(self.n_sensors)])
+        self.th_down = np.array([2**16-1 for i in range(self.n_sensors)])
         
         self.tare_counter = 0
 
@@ -78,15 +78,17 @@ class SensorController:
                 rospy.loginfo(f"Failed to open serial port {self.sensor.port}: {e}")
         else:
             rospy.loginfo("No valid sensor port found.")
-
+        time.sleep(1)
         if self.n_sensors >= 4:
             self.sensor.write(self.start_bytes1)
             self.find_header()
-            time.sleep(0.2)  
+            time.sleep(1)
+            print(f"Sensors {self.start_bytes1[4:]} OK!")
         if self.n_sensors >= 8:
             self.sensor.write(self.start_bytes2)
             self.find_header()
-            time.sleep(0.2)
+            time.sleep(1)
+            print(f"Sensors {self.start_bytes2[4:]} OK!") 
         if self.n_sensors >= 12:
             self.sensor.write(self.start_bytes3)
             self.find_header()
