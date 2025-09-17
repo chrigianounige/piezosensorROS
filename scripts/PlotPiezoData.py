@@ -7,7 +7,6 @@ import matplotlib
 matplotlib.use('TkAgg')
 from matplotlib.lines import Line2D
 from collections import deque
-from matplotlib.animation import FuncAnimation
 from piezosensorROS.msg import Piezosensor, Thresholds
 
 class PlotterNode:
@@ -21,7 +20,7 @@ class PlotterNode:
 
         # Soglie
         self.th_up = np.array([0] * self.n_sensors)
-        self.th_down = np.array([2**16] * self.n_sensors)
+        self.th_down = np.array([2**16-1] * self.n_sensors)
 
         # Setup figura
         self.fig, self.ax = plt.subplots()
@@ -29,12 +28,15 @@ class PlotterNode:
         self.th_up_lines = []
         self.th_down_lines = []
 
+        x_data = range(self.buffer_size)
         for i, line in enumerate(self.lines):
             color = line.get_color()
-            self.th_up_lines.append(Line2D([], [], color=color, linestyle='--', alpha=0.7))
-            self.th_down_lines.append(Line2D([], [], color=color, linestyle=':', alpha=0.7))
-            self.ax.add_line(self.th_up_lines[-1])
-            self.ax.add_line(self.th_down_lines[-1])
+            th_up_line = Line2D(x_data, [self.th_up[i]] * self.buffer_size, color=color, linestyle='--', alpha=0.7)
+            th_down_line = Line2D(x_data, [self.th_down[i]] * self.buffer_size, color=color, linestyle=':', alpha=0.7)
+            self.th_up_lines.append(th_up_line)
+            self.th_down_lines.append(th_down_line)
+            self.ax.add_line(th_up_line)
+            self.ax.add_line(th_down_line)
 
         self.ax.set_xlim(0, self.buffer_size)
         self.ax.set_ylim(0, 65535)
@@ -44,11 +46,9 @@ class PlotterNode:
         self.ax.legend()
 
         # Subscriber ROS
-        rospy.Subscriber('/piezosensors', Piezosensor, self.callback)
+        rospy.Subscriber('/piezosensor', Piezosensor, self.callback)
         rospy.Subscriber('/thresholds', Thresholds, self.threshold_callback)
 
-        # Animazione
-        self.ani = FuncAnimation(self.fig, self.update_plot, interval=50, blit=False, cache_frame_data=False)
 
     def callback(self, msg):
         data = msg.data
@@ -63,18 +63,22 @@ class PlotterNode:
         self.th_down = msg.th_down
         rospy.loginfo("Soglie aggiornate!")
 
-    def update_plot(self, frame):
-        for i in range(self.n_sensors):
-            ydata = list(self.data_buffer[i])
-            self.lines[i].set_data(range(len(ydata)), ydata)
-            self.th_up_lines[i].set_data(range(self.buffer_size), [self.th_up[i]]*self.buffer_size)
-            self.th_down_lines[i].set_data(range(self.buffer_size), [self.th_down[i]]*self.buffer_size)
-        return self.lines + self.th_up_lines + self.th_down_lines
-
     def run(self):
-        plt.show()  # GUI Matplotlib nel thread principale
-        rospy.spin()  # ROS gestisce i callback
+        rate = rospy.Rate(100)  # Frequenza di aggiornamento
+        while not rospy.is_shutdown():
+            for i in range(self.n_sensors):
+                self.lines[i].set_xdata(range(self.buffer_size))
+                self.lines[i].set_ydata(list(self.data_buffer[i]))
+                self.th_up_lines[i].set_xdata(range(self.buffer_size))
+                self.th_down_lines[i].set_xdata(range(self.buffer_size))
+                self.th_up_lines[i].set_ydata([self.th_up[i]] * self.buffer_size)
+                self.th_down_lines[i].set_ydata([self.th_down[i]] * self.buffer_size)
+
+            plt.pause(0.01)  # Aggiorna il grafico
+            rate.sleep()
 
 if __name__ == '__main__':
     plotter = PlotterNode()
     plotter.run()
+
+        
