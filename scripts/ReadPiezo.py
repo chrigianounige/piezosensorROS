@@ -20,11 +20,13 @@ class SensorController:
         self.n_sensors = rospy.get_param("~n_sensors", 8)
         self.start_tare = rospy.get_param("~start_tare", False)
         self.tare_window = rospy.get_param("~tare_window", 1000)
+        self.tare_method = rospy.get_param("~tare_method", "std")  # "std" or "percentiles"
+        self.tare_cofficient = rospy.get_param("~tare_coefficient", 3)
         rospy.loginfo(f"Number of sensors: {self.n_sensors}")
 
-        self.tare_values = np.array([0 for i in range(self.n_sensors)])
         self.tare_base = np.array([0 for i in range(self.n_sensors)])
         self.tare_std = np.array([0 for i in range(self.n_sensors)])
+        self.tare_buffer = []
         self.th_up = np.array([0 for i in range(self.n_sensors)])
         self.th_down = np.array([2**16-1 for i in range(self.n_sensors)])
         
@@ -147,23 +149,38 @@ class SensorController:
         return TareResponse(True)
     
     
-    def check_tare(self, data):
+    def compute_tare_std(self, data):
         if self.start_tare and self.tare_counter < self.tare_window:
             self.tare_base += np.array(data)
             self.tare_std += np.array(data)**2
             self.tare_counter += 1
         elif self.start_tare and self.tare_counter == self.tare_window:
-            self.tare_values = self.tare_base//self.tare_window
-            self.tare_std = np.sqrt(self.tare_std//self.tare_window - self.tare_values**2)
-            self.th_up = self.tare_values + 2*(self.tare_std)
-            self.th_down = self.tare_values - 2*(self.tare_std)
+            tare_values = self.tare_base//self.tare_window
+            self.tare_std = np.sqrt(self.tare_std//self.tare_window - tare_values**2)
+            self.th_up = tare_values + 2*(self.tare_std)
+            self.th_down = tare_values - 2*(self.tare_std)
             self.start_tare = False
             self.tare_counter = 0
             self.tare_base = np.array([0 for i in range(self.n_sensors)])
             self.publish_thresholds()
             rospy.loginfo("Tare completed")
-            # rospy.loginfo(f"Thresholds: {self.th_up} - {self.th_down}")
-            # rospy.loginfo(f"Tare values: {self.tare_values}")
+    
+
+    def compute_tare_percentiles(self, data):
+        if self.start_tare and self.tare_counter < self.tare_window:
+            self.tare_buffer.append(data)
+            self.tare_counter += 1
+        elif self.start_tare and self.tare_counter == self.tare_window:
+            tare_buffer_array = np.array(self.tare_buffer)
+            tare_median = np.median(tare_buffer_array, axis=0)
+            tare_p20 = np.percentile(tare_buffer_array, 20, axis=0)
+            tare_p80 = np.percentile(tare_buffer_array, 80, axis=0)
+            self.th_up = tare_median + self.tare_cofficient*(tare_p80 - tare_median)
+            self.th_down = tare_median - self.tare_cofficient*(tare_median - tare_p20)
+            self.start_tare = False
+            self.tare_counter = 0
+            self.publish_thresholds()
+            rospy.loginfo("Tare completed")
 
 
     def run(self):
@@ -174,17 +191,19 @@ class SensorController:
             counter += 1
             data = self.read()
             data = self.extract_bytes(data)
-            self.check_tare(data)
+            if self.tare_method == "std":
+                self.compute_tare_std(data)
+            elif self.tare_method == "percentiles":
+                self.compute_tare_percentiles(data)
+            else:
+                rospy.loginfo("Invalid tare method. Use 'std' or 'percentiles'.")
+                self.start_tare = False
             correct_data = list(np.array(data))
             self.data = correct_data
-        #self.collect_data(correct_data)
             self.publish_data()
-            
-            
-            
+              
         self.sensor.close()
-
-        #self.stop()
+        
 
 if __name__ == '__main__':
     sensor_controller = SensorController()
