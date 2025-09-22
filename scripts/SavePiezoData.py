@@ -7,11 +7,13 @@ import time
 from pathlib import Path
 import os
 
+########################## TODO ##########################
+
 class DataSaver:
     def __init__(self):
         rospy.init_node('data_saver', anonymous=False)
         self.buffer = []
-        self.save_interval = 10000  # Salva ogni 100 campioni
+        self.save_interval = 10000  # Salva ogni 10000 campioni
         self.data_dir = Path.home() / "piezosensor_data"
         self.file_counter = 0
 

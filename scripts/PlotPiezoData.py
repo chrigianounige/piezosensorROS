@@ -9,6 +9,7 @@ from matplotlib.lines import Line2D
 from collections import deque
 from piezosensorROS.msg import Piezosensor, Thresholds
 
+
 class PlotterNode:
     def __init__(self):
         rospy.init_node('plotter_node', anonymous=True)
@@ -58,10 +59,12 @@ class PlotterNode:
         for i in range(self.n_sensors):
             self.data_buffer[i].append(data[i])
 
+
     def threshold_callback(self, msg):
         self.th_up = msg.th_up
         self.th_down = msg.th_down
         rospy.loginfo("Soglie aggiornate!")
+
 
     def run(self):
         rate = rospy.Rate(100)  # Frequenza di aggiornamento

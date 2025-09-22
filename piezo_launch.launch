@@ -14,7 +14,7 @@
     <param name="tare_method" value="percentiles"/> <!-- "std" or "percentiles" -->
     <param name="tare_coefficient" value="5"/> <!-- Used only if tare_method is "percentiles" -->
     <param name="str1" value="num1,21,22,23,24\r\n"/>
-    <param name="str2" value="num2,25,26,27,28\r\n"/>
+    <!-- <param name="str2" value="num2,25,26,27,28\r\n"/> -->
     <!-- <param name="str3" value="num3,25,26,27,28\r\n"/> -->
     <!-- <param name="str4" value="num4,29,30,31,32\r\n"/> -->
   </node>
