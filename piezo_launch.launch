@@ -18,4 +18,10 @@
     <!-- <param name="str3" value="num3,25,26,27,28\r\n"/> -->
     <!-- <param name="str4" value="num4,29,30,31,32\r\n"/> -->
   </node>
+
+  <!-- Nodo per il rilevamento eventi -->
+  <node pkg="piezosensorROS" type="DetectEvents.py" name="event_detector_node" output="screen">
+    <param name="n_sensors" value="8"/>
+    <param name="min_number_of_active_sensors" value="3"/>
+  </node> 
 </launch>

@@ -46,52 +46,52 @@ class EventDetector:
 
 
     def run(self):
-    rate = rospy.Rate(3000)  # Event checking frequency
-    possible_event_detected = False
-    event_detected = False
-    samples_counter = 0
-    window_length = 25  # Number of cycles to confirm the event
-    possible_event_buffer = [0] * self.n_sensors  # Track possible event state of each sensor
-    event_buffer = [0] * self.n_sensors  # Track confirmed event state of each sensor
+        rate = rospy.Rate(3000)  # Event checking frequency
+        possible_event_detected = False
+        event_detected = False
+        samples_counter = 0
+        window_length = 25  # Number of cycles to confirm the event
+        possible_event_buffer = [0] * self.n_sensors  # Track possible event state of each sensor
+        event_buffer = [0] * self.n_sensors  # Track confirmed event state of each sensor
 
-    while not rospy.is_shutdown():
-        index_active_sensors, active_sensors_count = self.check_event()  # Check if sensors exceed thresholds
+        while not rospy.is_shutdown():
+            index_active_sensors, active_sensors_count = self.check_event()  # Check if sensors exceed thresholds
 
-        # A possible event is detected (transition from no event to some active sensors)
-        if not possible_event_detected and active_sensors_count:
-            possible_event_detected = True
-            samples_counter = 1
-            for idx in index_active_sensors:
-                possible_event_buffer[idx] = 1
+            # A possible event is detected (transition from no event to some active sensors)
+            if not possible_event_detected and active_sensors_count:
+                possible_event_detected = True
+                samples_counter = 1
+                for idx in index_active_sensors:
+                    possible_event_buffer[idx] = 1
 
-        elif possible_event_detected:
-            samples_counter += 1
+            elif possible_event_detected:
+                samples_counter += 1
 
-            # Still within the confirmation window
-            if samples_counter < window_length:
-                if active_sensors_count:
-                    for idx in index_active_sensors:
-                        possible_event_buffer[idx] = 1
-            else:
-                # Window length reached → finalize decision
-                possible_event_detected = False
-                samples_counter = 0
-                final_active_sensors = [i for i, v in enumerate(possible_event_buffer) if v]
-
-                if not event_detected:
-                    # Event press: confirm if enough sensors are active
-                    if len(final_active_sensors) >= self.min_number_of_active_sensors:
-                        event_detected = True
-                        event_buffer = possible_event_buffer.copy()
-                        rospy.loginfo(f"Event detected with {final_active_sensors} active sensors.")
+                # Still within the confirmation window
+                if samples_counter < window_length:
+                    if active_sensors_count:
+                        for idx in index_active_sensors:
+                            possible_event_buffer[idx] = 1
                 else:
-                    # Event release: check how many previously active sensors are active again
-                    num_of_actives = sum(event_buffer[i] and (i in final_active_sensors) for i in range(self.n_sensors))
-                    if num_of_actives > int(0.5 * self.min_number_of_active_sensors):
-                        event_detected = False
-                        event_buffer = [0] * self.n_sensors
-                        possible_event_buffer = [0] * self.n_sensors
-                        rospy.loginfo("Event ended.")
+                    # Window length reached → finalize decision
+                    possible_event_detected = False
+                    samples_counter = 0
+                    final_active_sensors = [i for i, v in enumerate(possible_event_buffer) if v]
+
+                    if not event_detected:
+                        # Event press: confirm if enough sensors are active
+                        if len(final_active_sensors) >= self.min_number_of_active_sensors:
+                            event_detected = True
+                            event_buffer = possible_event_buffer.copy()
+                            rospy.loginfo(f"Event detected with {final_active_sensors} active sensors.")
+                    else:
+                        # Event release: check how many previously active sensors are active again
+                        num_of_actives = sum(event_buffer[i] and (i in final_active_sensors) for i in range(self.n_sensors))
+                        if num_of_actives > int(0.5 * self.min_number_of_active_sensors):
+                            event_detected = False
+                            event_buffer = [0] * self.n_sensors
+                            possible_event_buffer = [0] * self.n_sensors
+                            rospy.loginfo("Event ended.")
         rate.sleep()
         
 if __name__ == '__main__':
