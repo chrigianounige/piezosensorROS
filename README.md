@@ -26,6 +26,7 @@ RUN rm -f /etc/ros/rosdep/sources.list.d/20-default.list && rosdep init && rosde
 
 # Create a ROS workspace
 RUN mkdir -p /root/**project_name_ros**/src
+RUN mkdir -p /tmp/ros_home/.ros*
 
 # Set working directory
 WORKDIR /root/**project_name_ros**
