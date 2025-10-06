@@ -17,6 +17,7 @@ add_message_files(
 add_service_files(
   FILES
   Tare.srv
+  ResetEvents.srv
 )
 
 generate_messages(
@@ -35,5 +36,6 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/ReadPiezo.py
   scripts/PlotPiezoData.py
+  scripts/DetectEvents.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
